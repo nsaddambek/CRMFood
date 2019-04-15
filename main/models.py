@@ -35,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.login
 
 
-class Departament(models.Model):
+class Department(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -44,7 +44,7 @@ class Departament(models.Model):
 
 class MealCategory(models.Model):
     name = models.CharField(max_length=50)
-    departamentid = models.ForeignKey(Departament, models.CASCADE)
+    departmentid = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -58,17 +58,8 @@ class ServicePercentage(models.Model):
 
 
 class Status(models.Model):
-    LOAN_STATUS = (
-        (1, 'to do'),
-        (2, 'in progress'),
-        (3, 'done'),
-    )
 
-    name = models.IntegerField(
-        choices=LOAN_STATUS,
-        blank=True,
-        help_text='Order status',
-    )
+    name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
@@ -83,18 +74,19 @@ class Table(models.Model):
 
 class Meal(models.Model):
     name = models.CharField(max_length=50)
+    categoryid = models.ForeignKey(MealCategory, on_delete=models.CASCADE)
     price = models.IntegerField()
     description = models.TextField()
-    mealcategory = models.ForeignKey(MealCategory, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class Order(models.Model):
-    table = models.ForeignKey(Table, on_delete=models.CASCADE)
+    waiterid = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
     date = models.DateTimeField(auto_now_add=True)
-    isitopen = models.ForeignKey(Status, on_delete=models.CASCADE)
+    isitopen = models.BooleanField(default=True)
     meals = models.ManyToManyField(Meal, through='MealID')
 
     def get_cost(self):

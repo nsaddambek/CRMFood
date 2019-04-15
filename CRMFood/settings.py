@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -81,8 +82,8 @@ WSGI_APPLICATION = 'CRMFood.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB-NAME'),
-        'USER': config('DB-USER'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
         'PASSWORD': config('BD_PASS'),
         'HOST': config('HOST'),
         'PORT': config('PORT'),
