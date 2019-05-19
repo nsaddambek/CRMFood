@@ -45,14 +45,14 @@ class ServicePercentageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServicePercentage
-        fields = ['price']
+        fields = ['percentage']
 
 
 class MealSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meal
-        fields = '__all__'
+        fields = ['id', 'name', 'price', 'categoryid', 'description']
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
@@ -67,11 +67,11 @@ class MealSerializer(serializers.ModelSerializer):
 
 class MealIDSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(
-        source='meal.id'
+        source='mealiteam.id'
     )
 
     name = serializers.CharField(
-        source='meal.name'
+        source='mealiteam.name'
     )
 
     class Meta:
@@ -80,9 +80,9 @@ class MealIDSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    waiterid = serializers.HiddenField(
-        default=serializers.CurrentUserDefault()
-    )
+    # waiterid = serializers.HiddenField(
+    #     default=serializers.CurrentUserDefault()
+    # )
 
     tableid = serializers.IntegerField(
         source='table.id'
@@ -93,24 +93,25 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    mealsid = MealIDSerializer(
-        source='meals',
+    meals = MealIDSerializer(
+        source='meals_order',
         many=True,
     )
 
     class Meta:
         model = Order
-        fields = ['id', 'waiterid', 'tableid', 'tablename', 'isitopen', 'date', 'mealsid']
+        fields = ['id', 'waiterid', 'tableid', 'tablename', 'isitopen', 'date', 'meals']
 
     def create(self, validated_data):
-        meal_data = validated_data.pop('mealsid')
+        print(validated_data)
+        meal_data = validated_data.pop('meals')
 
-        order = Order.objects.create(isitopen=True, table=validated_data['table'])
+        order = Order.objects.create(isitopen=True, table=Table(validated_data['table']['id']))
 
         for meal in meal_data:
             MealID.objects.create(
                 order=order,
-                meal=meal['id'],
+                meal=Meal(meal['meal']['id']),
                 count=meal['count']
             ).save()
 

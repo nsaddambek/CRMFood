@@ -51,10 +51,10 @@ class MealCategory(models.Model):
 
 
 class ServicePercentage(models.Model):
-    price = models.IntegerField()
+    percentage = models.IntegerField()
 
     def __str__(self):
-        return str(self.price)
+        return str(self.percentage)
 
 
 class Status(models.Model):
@@ -90,12 +90,12 @@ class Order(models.Model):
     meals = models.ManyToManyField(Meal, through='MealID')
 
     def get_cost(self):
-        return sum(item.get_price() for item in self.mealid_set.all())
+        return sum(item.get_price() for item in self.meals_order.all())
 
 
 class MealID(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='meals_order')
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='mealiteam')
     count = models.IntegerField()
 
     def get_price(self):
@@ -108,4 +108,4 @@ class Check(models.Model):
     servicefee = models.ForeignKey(ServicePercentage, on_delete=None)
 
     def get_total_cost(self):
-        return self.order.get_cost() + self.servicefee.price
+        return self.order.get_cost() + self.servicefee.percentage

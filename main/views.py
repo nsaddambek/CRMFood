@@ -127,7 +127,7 @@ class MealCategoryViewList(APIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -172,7 +172,9 @@ class ServicePercentageView(APIView):
 
     def get(self, request):
         percentage = ServicePercentage.objects.get(id=1)
+
         serializer = ServicePercentageSerializer(percentage)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
@@ -256,20 +258,21 @@ class OrderViewList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+        print(serializer.error_messages)
+        print(serializer.errors)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 '''
 {
     "tableid": 2,
-    "mealsid" : [
+    "meals" : [
         {
-            "id": 2,
+            "id": 1,
             "name": "plov", 
             "count": 3
         },
         {
-            "id": 4,
+            "id": 2,
             "name": "lagman",
             "count": 1
         }
